@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>特教數學互動教室</title>
     <style>
-        @import url('https://cdn.jsdelivr.net/gh/sunnysunny612/jf-open-huninn@master/jf-open-huninn.css');
+        @import url('https://fastly.jsdelivr.net/gh/justfont/open-huninn-font@1.1/font/jf-open-huninn.css');
 
         :root {
             --primary-color: #4A90E2;
@@ -15,8 +15,12 @@
             --wrong-color: #D0021B;
         }
 
+        /* 強制所有元素套用粉圓體，解決顯示不像的問題 */
+        * {
+            font-family: 'jf-open-huninn', "Microsoft JhengHei", sans-serif !important;
+        }
+
         body {
-            font-family: 'jf-open-huninn', "Microsoft JhengHei", sans-serif;
             background-color: var(--bg-color);
             margin: 0;
             display: flex;
@@ -39,7 +43,6 @@
         .screen { display: none; }
         .active { display: block; }
 
-        /* 標題與大廳樣式 */
         h1 { font-size: 3.5rem; color: var(--primary-color); margin-bottom: 20px; }
         .lobby-grid {
             display: grid;
@@ -72,7 +75,6 @@
 
         .unit-number { font-size: 1.2rem; color: #888; font-weight: bold; }
 
-        /* 按鈕樣式 */
         .btn {
             background: var(--primary-color);
             color: white;
@@ -82,20 +84,18 @@
             border-radius: 50px;
             cursor: pointer;
             margin: 15px;
-            font-family: 'jf-open-huninn', sans-serif;
             transition: transform 0.2s;
         }
         .btn:hover { transform: scale(1.1); }
         .btn-secondary { background: var(--secondary-color); font-size: 1.5rem; }
 
-        /* 題目顯示區：超大字體 */
         .question-box {
             text-align: left;
             background: #f0f7ff;
             padding: 40px;
             border-left: 12px solid var(--primary-color);
             margin: 35px 0;
-            font-size: 2.8rem; /* 特別加大題目字體 */
+            font-size: 2.8rem; 
             font-weight: bold;
             line-height: 1.6;
         }
@@ -108,13 +108,12 @@
 
         .option-btn {
             padding: 30px;
-            font-size: 2.2rem; /* 特別加大選項字體 */
+            font-size: 2.2rem;
             font-weight: bold;
             border: 4px solid #ddd;
             border-radius: 20px;
             background: white;
             cursor: pointer;
-            font-family: 'jf-open-huninn', sans-serif;
             transition: all 0.2s;
         }
 
@@ -122,7 +121,7 @@
 
         #u1-progress { font-size: 1.5rem; color: #666; font-weight: bold; }
 
-        /* 結算印章語句 */
+        /* 你可以去蓋印章了：最終樣式 */
         #stamp-area {
             font-size: 3.5rem;
             color: var(--correct-color);
@@ -135,7 +134,7 @@
             background: #f9fff9;
         }
 
-        /* 靜安提示語句 */
+        /* 請安靜：最終樣式 */
         .quiet-remind {
             font-size: 1.6rem;
             color: #888;
@@ -147,7 +146,6 @@
 <body>
 
 <div id="main-container">
-    
     <div id="screen-lobby" class="screen active">
         <h1>🏫 數學冒險大廳</h1>
         <p style="font-size: 1.8rem;">請選擇一個單元開始挑戰吧！</p>
@@ -190,11 +188,9 @@
         <button class="btn" onclick="startUnit1()">再玩一次</button>
         <button class="btn btn-secondary" onclick="showScreen('screen-lobby')">回遊戲大廳</button>
     </div>
-
 </div>
 
 <script>
-    // 題目資料設定
     const u1Data = [
         { q: "爸爸有100元，買了15元的飲料3瓶，請問找回多少元？", options: ["100 - 15 × 3", "(100 - 15) × 3", "100 - (15 + 3)", "100 + 15 × 3"], correct: 0 },
         { q: "若涵買了4個30元的橡皮擦跟2個60元的自動鉛筆，請問需要付多少元？", options: ["(30 + 60) × (4 + 2)", "30 × 4 + 60 × 2", "(30 × 4) - (60 × 2)", "30 × 60 + 4 × 2"], correct: 1 },
@@ -206,18 +202,15 @@
     let u1Current = 0;
     let u1Score = 0;
 
-    // 通用功能：切換螢幕
     function showScreen(screenId) {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         document.getElementById(screenId).classList.add('active');
     }
 
-    // 大廳導航
     function goToUnit(num) {
         if(num === 1) showScreen('screen-unit1-start');
     }
 
-    // 單元一邏輯
     function startUnit1() {
         u1Current = 0;
         u1Score = 0;
@@ -230,7 +223,6 @@
         document.getElementById('u1-progress').innerText = `進度：${u1Current + 1} / ${u1Data.length}`;
         document.getElementById('u1-question').innerText = data.q;
         document.getElementById('u1-feedback').innerText = '';
-        
         const optDiv = document.getElementById('u1-options');
         optDiv.innerHTML = '';
         data.options.forEach((opt, idx) => {
@@ -246,7 +238,6 @@
         const correct = u1Data[u1Current].correct;
         const feedback = document.getElementById('u1-feedback');
         const btns = document.querySelectorAll('.option-btn');
-
         if(idx === correct) {
             u1Score++;
             feedback.style.color = 'var(--correct-color)';
@@ -255,9 +246,7 @@
             feedback.style.color = 'var(--wrong-color)';
             feedback.innerText = '不對喔，再檢查一下！';
         }
-
         btns.forEach(b => b.disabled = true);
-
         setTimeout(() => {
             u1Current++;
             if(u1Current < u1Data.length) loadU1Question();
@@ -268,10 +257,8 @@
     function showU1Result() {
         showScreen('screen-unit1-result');
         document.getElementById('u1-result-text').innerText = `好棒！你答對了 ${u1Score} 題！`;
-        // 如果全對，顯示蓋印章訊息
         document.getElementById('stamp-area').style.display = (u1Score === u1Data.length) ? 'inline-block' : 'none';
     }
 </script>
-
 </body>
 </html>
