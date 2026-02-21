@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>數學算式大挑戰</title>
+    <title>特教數學互動教室</title>
     <style>
         :root {
             --primary-color: #4A90E2;
@@ -11,53 +11,89 @@
             --bg-color: #F0F4F8;
             --correct-color: #7ED321;
             --wrong-color: #D0021B;
+            --card-bg: #FFFFFF;
         }
 
         body {
             font-family: "Microsoft JhengHei", sans-serif;
             background-color: var(--bg-color);
+            margin: 0;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            margin: 0;
+            min-height: 100vh;
         }
 
-        #game-container {
+        #main-container {
+            width: 90%;
+            max-width: 900px;
             background: white;
             padding: 2rem;
-            border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            width: 90%;
-            max-width: 600px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
             text-align: center;
         }
 
         .screen { display: none; }
         .active { display: block; }
 
-        h1 { color: var(--primary-color); }
+        /* 大廳樣式 */
+        .lobby-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .unit-card {
+            background: #fff;
+            border: 3px solid #eee;
+            border-radius: 15px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .unit-card.active-unit:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-color);
+            box-shadow: 0 5px 15px rgba(74, 144, 226, 0.2);
+        }
+
+        .unit-card.locked {
+            background: #f9f9f9;
+            color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .unit-number {
+            font-size: 0.9rem;
+            color: #888;
+        }
+
+        /* 遊戲按鈕樣式 */
         .btn {
             background: var(--primary-color);
             color: white;
             border: none;
-            padding: 10px 25px;
+            padding: 12px 30px;
             font-size: 1.2rem;
-            border-radius: 25px;
+            border-radius: 30px;
             cursor: pointer;
-            transition: transform 0.2s;
             margin: 10px;
         }
-        .btn:hover { transform: scale(1.05); }
 
-        .question-text {
-            font-size: 1.3rem;
-            margin-bottom: 1.5rem;
-            line-height: 1.6;
+        .btn-secondary { background: #95a5a6; }
+
+        /* 遊戲內容樣式 */
+        .question-box {
             text-align: left;
-            background: #eef2f7;
-            padding: 15px;
-            border-left: 5px solid var(--primary-color);
+            background: #f8f9fa;
+            padding: 20px;
+            border-left: 6px solid var(--primary-color);
+            margin: 20px 0;
+            font-size: 1.2rem;
         }
 
         .options-grid {
@@ -67,171 +103,162 @@
         }
 
         .option-btn {
-            background: white;
-            border: 2px solid #ddd;
             padding: 15px;
             font-size: 1.1rem;
+            border: 2px solid #ddd;
             border-radius: 10px;
+            background: white;
             cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .option-btn:hover {
-            border-color: var(--primary-color);
-            background: #f0f7ff;
-        }
-
-        .feedback {
-            margin-top: 15px;
-            font-weight: bold;
-            height: 24px;
         }
 
         #stamp-area {
-            font-size: 2rem;
+            font-size: 2.2rem;
             color: var(--correct-color);
-            margin: 20px 0;
+            font-weight: bold;
+            margin: 20px;
             display: none;
-        }
-
-        .quiet-remind {
-            font-size: 0.9rem;
-            color: #888;
-            margin-top: 20px;
         }
     </style>
 </head>
 <body>
 
-<div id="game-container">
-    <div id="lobby" class="screen active">
-        <h1>🧮 算式連連看大挑戰</h1>
-        <p>找出隱藏在故事背後的正確算式吧！</p>
-        <button class="btn" onclick="startGame()">進入遊戲</button>
-        <div class="quiet-remind">請安靜地思考，準備好了就開始！</div>
-    </div>
-
-    <div id="game" class="screen">
-        <div id="progress">第 1 / 5 題</div>
-        <div class="question-text" id="question">題目載入中...</div>
-        <div class="options-grid" id="options">
+<div id="main-container">
+    
+    <div id="screen-lobby" class="screen active">
+        <h1>🏫 數學冒險大廳</h1>
+        <p>請選擇一個單元開始挑戰吧！</p>
+        <div class="lobby-grid">
+            <div class="unit-card active-unit" onclick="goToUnit(1)">
+                <div class="unit-number">Unit 01</div>
+                <h3>四則運算</h3>
+                <p>算式連連看</p>
             </div>
-        <div id="feedback" class="feedback"></div>
+            <div class="unit-card locked">
+                <div class="unit-number">Unit 02</div>
+                <h3>敬請期待</h3>
+            </div>
+            <div class="unit-card locked">
+                <div class="unit-number">Unit 03</div>
+                <h3>敬請期待</h3>
+            </div>
+            <div class="unit-card locked">
+                <div class="unit-number">Unit 04</div>
+                <h3>敬請期待</h3>
+            </div>
+            <div class="unit-card locked">
+                <div class="unit-number">Unit 05</div>
+                <h3>敬請期待</h3>
+            </div>
+            <div class="unit-card locked">
+                <div class="unit-number">Unit 06</div>
+                <h3>敬請期待</h3>
+            </div>
+        </div>
     </div>
 
-    <div id="result" class="screen">
-        <h1>太棒了！</h1>
-        <p id="score-text"></p>
-        <div id="stamp-area">✨ 你可以去蓋印章了 ✨</div>
-        <button class="btn" onclick="resetGame()">重新挑戰</button>
+    <div id="screen-unit1-start" class="screen">
+        <h1 style="color:var(--primary-color)">📘 算式連連看大挑戰</h1>
+        <p>找出隱藏在故事背後的正確算式吧！</p>
+        <br>
+        <button class="btn" onclick="startUnit1()">進入遊戲</button>
+        <br>
+        <button class="btn btn-secondary" onclick="showScreen('screen-lobby')">回大廳</button>
+        <p style="color:#888; margin-top:30px;">請安靜地思考，準備好了就開始！</p>
     </div>
+
+    <div id="screen-unit1-game" class="screen">
+        <div id="u1-progress">第 1 / 5 題</div>
+        <div class="question-box" id="u1-question">載入中...</div>
+        <div class="options-grid" id="u1-options"></div>
+        <div id="u1-feedback" style="margin-top:20px; font-weight:bold; height:30px;"></div>
+    </div>
+
+    <div id="screen-unit1-result" class="screen">
+        <h1>🎊 挑戰完成！</h1>
+        <p id="u1-result-text"></p>
+        <div id="stamp-area">✨ 你可以去蓋印章了 ✨</div>
+        <button class="btn" onclick="startUnit1()">再玩一次</button>
+        <button class="btn btn-secondary" onclick="showScreen('screen-lobby')">回遊戲大廳</button>
+    </div>
+
 </div>
 
 <script>
-    const questions = [
-        {
-            q: "爸爸有100元，買了15元的飲料3瓶，請問找回多少元？",
-            options: ["100 - 15 × 3", "(100 - 15) × 3", "100 - (15 + 3)", "100 + 15 × 3"],
-            correct: 0
-        },
-        {
-            q: "若涵買了4個30元的橡皮擦跟2個60元的自動鉛筆，請問需要付多少元？",
-            options: ["(30 + 60) × (4 + 2)", "30 × 4 + 60 × 2", "(30 × 4) - (60 × 2)", "30 × 60 + 4 × 2"],
-            correct: 1
-        },
-        {
-            q: "麵粉原本有100公克，一個小蛋糕需要15.2公克的麵粉，老師做了3個，請問還剩下多少麵粉？",
-            options: ["(100 - 15.2) × 3", "100 + 15.2 × 3", "100 - 15.2 × 3", "100 ÷ (15.2 × 3)"],
-            correct: 2
-        },
-        {
-            q: "一個三角形的面積是6平方公分，已知高是7.5公分，請問底是多少？",
-            options: ["6 × 7.5 ÷ 2", "6 ÷ 7.5", "6 × 2 ÷ 7.5", "(6 + 7.5) ÷ 2"],
-            correct: 2
-        },
-        {
-            q: "一個馬卡龍是2.5歐元，一個可麗露是3.8歐元，小華各買了4個，請問要付多少元？",
-            options: ["2.5 + 3.8 × 4", "(2.5 + 3.8) × 4", "(2.5 × 4) + 3.8", "2.5 + 3.8 + 4"],
-            correct: 1
-        }
+    // 遊戲題目資料
+    const u1Data = [
+        { q: "爸爸有100元，買了15元的飲料3瓶，請問找回多少元？", options: ["100 - 15 × 3", "(100 - 15) × 3", "100 - (15 + 3)", "100 + 15 × 3"], correct: 0 },
+        { q: "若涵買了4個30元的橡皮擦跟2個60元的自動鉛筆，請問需要付多少元？", options: ["(30 + 60) × (4 + 2)", "30 × 4 + 60 × 2", "(30 × 4) - (60 × 2)", "30 × 60 + 4 × 2"], correct: 1 },
+        { q: "麵粉原本有100公克，一個小蛋糕需要15.2公克的麵粉，老師做了3個，請問還剩下多少麵粉？", options: ["(100 - 15.2) × 3", "100 + 15.2 × 3", "100 - 15.2 × 3", "100 ÷ (15.2 × 3)"], correct: 2 },
+        { q: "一個三角形的面積是6平方公分，已知高是7.5公分，請問底是多少？", options: ["6 × 7.5 ÷ 2", "6 ÷ 7.5", "6 × 2 ÷ 7.5", "(6 + 7.5) ÷ 2"], correct: 2 },
+        { q: "一個馬卡龍是2.5歐元，一個可麗露是3.8歐元，小華各買了4個，請問要付多少元？", options: ["2.5 + 3.8 × 4", "(2.5 + 3.8) × 4", "(2.5 × 4) + 3.8", "2.5 + 3.8 + 4"], correct: 1 }
     ];
 
-    let currentQ = 0;
-    let score = 0;
+    let u1Current = 0;
+    let u1Score = 0;
 
-    function startGame() {
-        showScreen('game');
-        loadQuestion();
+    // 切換螢幕
+    function showScreen(screenId) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(screenId).classList.add('active');
     }
 
-    function loadQuestion() {
-        const qData = questions[currentQ];
-        document.getElementById('progress').innerText = `第 ${currentQ + 1} / ${questions.length} 題`;
-        document.getElementById('question').innerText = qData.q;
-        document.getElementById('feedback').innerText = '';
+    // 進入單元啟動頁
+    function goToUnit(num) {
+        if(num === 1) showScreen('screen-unit1-start');
+    }
+
+    // 開始玩第一單元
+    function startUnit1() {
+        u1Current = 0;
+        u1Score = 0;
+        showScreen('screen-unit1-game');
+        loadU1Question();
+    }
+
+    function loadU1Question() {
+        const data = u1Data[u1Current];
+        document.getElementById('u1-progress').innerText = `第 ${u1Current + 1} / ${u1Data.length} 題`;
+        document.getElementById('u1-question').innerText = data.q;
+        document.getElementById('u1-feedback').innerText = '';
         
-        const optionsDiv = document.getElementById('options');
-        optionsDiv.innerHTML = '';
-        
-        qData.options.forEach((opt, index) => {
-            const btn = document.createElement('button');
-            btn.className = 'option-btn';
-            btn.innerText = opt;
-            btn.onclick = () => checkAnswer(index);
-            optionsDiv.appendChild(btn);
+        const optDiv = document.getElementById('u1-options');
+        optDiv.innerHTML = '';
+        data.options.forEach((opt, idx) => {
+            const b = document.createElement('button');
+            b.className = 'option-btn';
+            b.innerText = opt;
+            b.onclick = () => checkU1Answer(idx);
+            optDiv.appendChild(b);
         });
     }
 
-    function checkAnswer(index) {
-        const qData = questions[currentQ];
-        const feedback = document.getElementById('feedback');
-        const btns = document.getElementsByClassName('option-btn');
+    function checkU1Answer(idx) {
+        const correct = u1Data[u1Current].correct;
+        const feedback = document.getElementById('u1-feedback');
+        const btns = document.querySelectorAll('.option-btn');
 
-        if (index === qData.correct) {
-            score++;
+        if(idx === correct) {
+            u1Score++;
             feedback.style.color = 'var(--correct-color)';
-            feedback.innerText = '答對了！好棒！';
-            btns[index].style.background = '#e6f9e6';
-            btns[index].style.borderColor = 'var(--correct-color)';
+            feedback.innerText = '答對了！';
         } else {
             feedback.style.color = 'var(--wrong-color)';
-            feedback.innerText = '再想一想算式的順序喔！';
-            btns[index].style.background = '#ffe6e6';
-            btns[index].style.borderColor = 'var(--wrong-color)';
+            feedback.innerText = '不對喔，再想想看！';
         }
 
-        // 鎖定所有按鈕防止重複點擊
-        for(let b of btns) b.disabled = true;
+        btns.forEach(b => b.disabled = true);
 
         setTimeout(() => {
-            currentQ++;
-            if (currentQ < questions.length) {
-                loadQuestion();
-            } else {
-                showResult();
-            }
-        }, 1500);
+            u1Current++;
+            if(u1Current < u1Data.length) loadU1Question();
+            else showU1Result();
+        }, 1200);
     }
 
-    function showResult() {
-        showScreen('result');
-        document.getElementById('score-text').innerText = `你完成了 ${questions.length} 道挑戰，答對了 ${score} 題！`;
-        if (score === questions.length) {
-            document.getElementById('stamp-area').style.display = 'block';
-        } else {
-            document.getElementById('stamp-area').style.display = 'none';
-        }
-    }
-
-    function showScreen(id) {
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-    }
-
-    function resetGame() {
-        currentQ = 0;
-        score = 0;
-        showScreen('lobby');
+    function showU1Result() {
+        showScreen('screen-unit1-result');
+        document.getElementById('u1-result-text').innerText = `你答對了 ${u1Score} 題！`;
+        document.getElementById('stamp-area').style.display = (u1Score === u1Data.length) ? 'block' : 'none';
     }
 </script>
 
